@@ -1,59 +1,206 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏠 Smart Student Housing System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A web-based **Student Housing Management System** designed to help manage and organize student accommodation operations through a centralized management platform.
 
-## About Laravel
+The system provides a simple and structured way to manage **students, housing floors, payments, reports, authentication, and housing-related data**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📌 Project Overview
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Smart Student Housing System (SSHS)** is a Laravel-based management system developed to simplify the daily operations of student housing.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+The system helps administrators manage student information, accommodation data, payments, and reports from one centralized platform.
 
-## Learning Laravel
+### Main Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+* 👨‍🎓 Student management
+* 🏢 Housing floor management
+* 💰 Payment management
+* 📝 Reports and complaints management
+* 🔐 User authentication
+* 🌍 Arabic & English localization
+* 📊 Dashboard and statistics
+* 📥 Import student data
+* 📤 Export student and payment data
+* 🔎 Student search and filtering
+* 🗄️ Database migrations and seeders
+* 🧪 Automated testing support
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 🛠️ Technologies & Tools
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Backend
 
-### Premium Partners
+* **PHP 8.2+**
+* **Laravel 12**
+* **Laravel Sanctum** — API authentication support
+* **Laravel Tinker** — Laravel command-line interaction
+* **Spatie Laravel Permission** — Roles and permissions
+* **Laravel Localization** — Multi-language support
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Database
 
-## Contributing
+* **MySQL** / compatible relational database
+* **Laravel Eloquent ORM**
+* **Laravel Migrations**
+* **Laravel Seeders**
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Frontend
 
-## Code of Conduct
+* **Blade Templates**
+* **HTML5**
+* **CSS3**
+* **JavaScript**
+* **Tailwind CSS 4**
+* **Vite 7**
+* **Axios**
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Data Import & Export
 
-## Security Vulnerabilities
+* **Maatwebsite Laravel Excel**
+* **PhpSpreadsheet**
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Used for importing and exporting structured data such as student and payment records.
 
-## License
+### Testing & Development Tools
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+* **PHPUnit**
+* **FakerPHP**
+* **Mockery**
+* **Laravel Pint**
+* **Laravel Sail**
+* **Laravel Pail**
+
+### Development Utilities
+
+* **Composer** — PHP dependency management
+* **NPM** — Frontend dependency management
+* **Git & GitHub** — Version control and source-code management
+
+---
+
+## 🏗️ Architecture
+
+The project follows the **Laravel MVC (Model–View–Controller)** architecture.
+
+```text
+Smart Student Housing System
+│
+├── Laravel 12
+│   ├── Models
+│   ├── Controllers
+│   ├── Middleware
+│   ├── Requests
+│   └── Routes
+│
+├── Blade
+│   └── Views
+│
+├── MySQL
+│   └── Database
+│
+├── Tailwind CSS
+│   └── User Interface
+│
+└── Vite
+    └── Frontend Asset Management
+```
+
+---
+
+## 📦 Main Packages
+
+| Package              | Purpose                       |
+| -------------------- | ----------------------------- |
+| Laravel Framework    | Backend application framework |
+| Laravel Sanctum      | Authentication                |
+| Spatie Permission    | Roles & permissions           |
+| Laravel Localization | Multi-language support        |
+| Laravel Excel        | Excel import/export           |
+| PhpSpreadsheet       | Spreadsheet processing        |
+| Tailwind CSS         | UI styling                    |
+| Vite                 | Frontend build tool           |
+| Axios                | HTTP requests                 |
+| PHPUnit              | Automated testing             |
+| FakerPHP             | Test data generation          |
+| Mockery              | Mocking and testing           |
+
+---
+
+## 🚀 Installation
+
+### Requirements
+
+* PHP 8.2+
+* Composer
+* Node.js & NPM
+* MySQL
+* Git
+
+### Setup
+
+```bash
+git clone https://github.com/ziadsaleh123/Smart-Student-Housing-System.git
+
+cd Smart-Student-Housing-System
+
+composer install
+
+cp .env.example .env
+
+php artisan key:generate
+
+php artisan migrate
+
+npm install
+
+npm run build
+```
+
+Start the development server:
+
+```bash
+php artisan serve
+```
+
+For frontend development:
+
+```bash
+npm run dev
+```
+
+---
+
+## 🧪 Testing
+
+Run the Laravel test suite using:
+
+```bash
+php artisan test
+```
+
+Or:
+
+```bash
+composer test
+```
+
+---
+
+## 👨‍💻 Author
+
+**Ziad Saleh Yeslem Alhori**
+
+Web Designer & Full-Stack Developer
+
+GitHub: [@ziadsaleh123](https://github.com/ziadsaleh123)
+
+---
+
+## 📄 License
+
+This project is currently provided without a dedicated project-level license.
+
+---
+
+⭐ **Smart Student Housing System — A Laravel-based solution for managing student housing operations.**
