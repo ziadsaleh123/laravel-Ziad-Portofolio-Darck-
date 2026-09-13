@@ -12,6 +12,7 @@ use App\Models\Service;
 use App\Models\Project;
 use App\Models\Skill;
 use App\Models\SocialLink;
+use App\Models\Message;
 
 class MainController extends Controller
 {
@@ -24,7 +25,12 @@ class MainController extends Controller
         $socialLinks = SocialLink::orderBy('sort_order')->get();
 
         $services = Schema::hasTable('services')
-            ? Service::latest()->get()
+            ? Service::latest()
+                ->where(function ($q) {
+                    $q->where('service_status', 'متاحة')
+                      ->orWhereNull('service_status');
+                })
+                ->get()
             : collect();
 
         $skills = Schema::hasTable('skills')
@@ -65,10 +71,33 @@ class MainController extends Controller
             ? Skill::latest()->get()
             : collect();
 
+        $messages = Schema::hasTable('messages')
+            ? Message::latest()->get()
+            : collect();
+
+        $unreadMessagesCount = Schema::hasTable('messages')
+            ? Message::where('is_read', false)->count()
+            : 0;
+
         $editSkill = null;
+        $editService = null;
+        $editProject = null;
+        $editSocial = null;
 
         if ($page === 'skills' && $id) {
             $editSkill = Skill::findOrFail($id);
+        }
+
+        if ($page === 'services' && $request->has('editService')) {
+            $editService = Service::findOrFail($request->editService);
+        }
+
+        if ($page === 'projects' && $request->has('editProject')) {
+            $editProject = Project::findOrFail($request->editProject);
+        }
+
+        if ($page === 'contact' && $request->has('editSocial')) {
+            $editSocial = SocialLink::findOrFail($request->editSocial);
         }
 
         return view('dashboard', compact(
@@ -78,7 +107,12 @@ class MainController extends Controller
             'services',
             'projects',
             'skills',
-            'editSkill'
+            'messages',
+            'unreadMessagesCount',
+            'editSkill',
+            'editService',
+            'editProject',
+            'editSocial'
         ))->with('page', $page);
     }
 
@@ -180,7 +214,44 @@ class MainController extends Controller
 
         Project::create($data);
 
-        return back()->with('success', 'تم حفظ المشروع');
+        return back()->with('success', 'تم إضافة المشروع بنجاح');
+    }
+
+    public function updateProject(Request $request, $id)
+    {
+        $data = $request->validate([
+            'project_name' => 'required|string|max:255',
+            'project_link' => 'required|string|max:255',
+            'project_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+        $project = Project::findOrFail($id);
+
+        if ($request->hasFile('project_image')) {
+            if ($project->project_image) {
+                Storage::disk('public')->delete($project->project_image);
+            }
+
+            $data['project_image'] = $request->file('project_image')
+                ->store('projects', 'public');
+        }
+
+        $project->update($data);
+
+        return redirect()->route('dashboard.page', ['page' => 'projects'])->with('success', 'تم تعديل المشروع بنجاح');
+    }
+
+    public function deleteProject($id)
+    {
+        $project = Project::findOrFail($id);
+
+        if ($project->project_image) {
+            Storage::disk('public')->delete($project->project_image);
+        }
+
+        $project->delete();
+
+        return redirect()->route('dashboard.page', ['page' => 'projects'])->with('success', 'تم حذف المشروع بنجاح');
     }
 
     // ================= SKILLS =================
@@ -211,47 +282,123 @@ class MainController extends Controller
         return back()->with('success', 'تم حفظ المهارة');
     }
 
-    // ================= SOCIAL LINKS (NEW SYSTEM) =================
+    // ================= SOCIAL LINKS & CONTACT NUMBERS =================
 
-  public function storeSocial(Request $request)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'url'  => 'required|string|max:255',
-        'icon' => 'nullable|string|max:255',
-    ]);
+    public function storeSocial(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'url'  => 'required|string|max:255',
+            'icon' => 'nullable|string|max:255',
+        ]);
 
-    $url = $request->url;
+        $name = $request->input('name');
+        $url  = trim($request->input('url'));
+        $nameLower = strtolower($name);
 
-    // 🔥 إذا واتساب: تنظيف + إضافة كود الدولة تلقائيًا
-    if (str_contains(strtolower($request->name), 'whatsapp')) {
-
-        $phone = preg_replace('/[^0-9]/', '', $url);
-
-        // إذا ما فيه كود دولة أضف اليمن
-        if (!str_starts_with($phone, '967')) {
-            $phone = '967' . $phone;
+        // إذا كان واتساب أو هاتف/اتصال
+        if (str_contains($nameLower, 'whatsapp') || str_contains($nameLower, 'واتساب')) {
+            $phone = preg_replace('/[^0-9]/', '', $url);
+            if (!empty($phone) && !str_starts_with($phone, '967') && !str_starts_with($phone, '00967')) {
+                // إذا الرقم محلي يبدأ بـ 7 أو 07 أضف 967
+                $clean = ltrim($phone, '0');
+                $phone = '967' . $clean;
+            }
+            $url = $phone;
         }
 
-        $url = $phone;
+        SocialLink::create([
+            'name' => $name,
+            'url'  => $url,
+            'icon' => $request->input('icon') ?: 'ri-link',
+        ]);
+
+        return redirect()->route('dashboard.page', ['page' => 'contact'])->with('success', 'تم إضافة وسيلة التواصل بنجاح');
     }
 
-    SocialLink::create([
-        'name' => $request->name,
-        'url'  => $url,
-        'icon' => $request->icon,
-    ]);
+    public function updateSocial(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'url'  => 'required|string|max:255',
+            'icon' => 'nullable|string|max:255',
+        ]);
 
-    return back()->with('success', 'تم إضافة منصة جديدة');
+        $link = SocialLink::findOrFail($id);
+        $name = $request->input('name');
+        $url  = trim($request->input('url'));
+        $nameLower = strtolower($name);
 
-    
-}
-public function deleteSocial($id)
-{
-    $link = SocialLink::findOrFail($id);
+        // إذا كان واتساب أو هاتف/اتصال
+        if (str_contains($nameLower, 'whatsapp') || str_contains($nameLower, 'واتساب')) {
+            $phone = preg_replace('/[^0-9]/', '', $url);
+            if (!empty($phone) && !str_starts_with($phone, '967') && !str_starts_with($phone, '00967')) {
+                $clean = ltrim($phone, '0');
+                $phone = '967' . $clean;
+            }
+            $url = $phone;
+        }
 
-    $link->delete();
+        $link->update([
+            'name' => $name,
+            'url'  => $url,
+            'icon' => $request->input('icon') ?: 'ri-link',
+        ]);
 
-    return back()->with('success', 'تم حذف رابط التواصل');
-}
+        return redirect()->route('dashboard.page', ['page' => 'contact'])->with('success', 'تم تعديل وسيلة التواصل بنجاح');
+    }
+
+    public function deleteSocial($id)
+    {
+        $link = SocialLink::findOrFail($id);
+
+        $link->delete();
+
+        return redirect()->route('dashboard.page', ['page' => 'contact'])->with('success', 'تم حذف وسيلة التواصل');
+    }
+
+    // ================= MESSAGES =================
+
+    public function sendMessage(Request $request)
+    {
+        $data = $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|max:255',
+            'whatsapp' => 'nullable|string|max:50',
+            'subject'  => 'nullable|string|max:255',
+            'message'  => 'required|string',
+        ]);
+
+        $message = Message::create($data);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'تم حفظ الرسالة بنجاح',
+                'data'    => $message,
+            ]);
+        }
+
+        return back()->with('success', 'تم إرسال الرسالة بنجاح');
+    }
+
+    public function deleteMessage($id)
+    {
+        $message = Message::findOrFail($id);
+        $message->delete();
+
+        return redirect()->route('dashboard.page', ['page' => 'messages'])
+            ->with('success', 'تم حذف الرسالة بنجاح');
+    }
+
+    public function toggleMessageRead($id)
+    {
+        $message = Message::findOrFail($id);
+        $message->update([
+            'is_read' => !$message->is_read
+        ]);
+
+        return redirect()->route('dashboard.page', ['page' => 'messages'])
+            ->with('success', $message->is_read ? 'تم تحديد الرسالة كمقروءة' : 'تم تحديد الرسالة كغير مقروءة');
+    }
 }

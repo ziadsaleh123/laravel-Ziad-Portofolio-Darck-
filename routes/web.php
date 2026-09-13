@@ -21,6 +21,9 @@ Route::get('/', function () {
 Route::get('/portofolio', [MainController::class, 'portfolio'])
     ->name('portofolio');
 
+Route::post('/contact/message', [MainController::class, 'sendMessage'])
+    ->name('contact.send');
+
 /*
 |--------------------------------------------------------------------------
 | Auth Routes
@@ -118,6 +121,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/dashboard/projects/update/{id}', [MainController::class, 'updateProject'])
         ->name('projects.update');
 
+    // Delete Project
+    Route::delete('/dashboard/projects/delete/{id}', [MainController::class, 'deleteProject'])
+        ->name('projects.delete');
+
         /*
     |--------------------------------------------------------------------------
     | Skill
@@ -145,6 +152,20 @@ Route::get('/dashboard/{page}/edit-skill/{id}', [MainController::class, 'dashboa
    Route::post('/dashboard/social/store', [MainController::class, 'storeSocial'])
     ->name('social.store');
 
+   Route::put('/dashboard/social/update/{id}', [MainController::class, 'updateSocial'])
+    ->name('social.update');
+
     Route::delete('/dashboard/social/delete/{id}', [MainController::class, 'deleteSocial'])
     ->name('social.delete');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Messages
+    |--------------------------------------------------------------------------
+    */
+    Route::delete('/dashboard/messages/delete/{id}', [MainController::class, 'deleteMessage'])
+        ->name('messages.delete');
+
+    Route::post('/dashboard/messages/toggle-read/{id}', [MainController::class, 'toggleMessageRead'])
+        ->name('messages.toggleRead');
 });
